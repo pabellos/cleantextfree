@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CleanTextFree</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <strong>CleanTextFree</strong>
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-mode="ai" role="tab">Clean AI text</button>
+      <button class="tab" data-mode="hidden" role="tab">Hidden characters</button>
+    </div>
+  </header>
+  <textarea id="input" placeholder="Paste text from ChatGPT, Claude or Gemini…" autofocus></textarea>
+  <div class="opts" id="aiOpts">
+    <label>Em dash <select id="emDash"><option value="comma">→ comma</option><option value="hyphen">→ hyphen</option><option value="keep">keep</option></select></label>
+    <label><input type="checkbox" id="keepLinks"> Keep link URLs</label>
+  </div>
+  <textarea id="output" readonly placeholder="Clean text appears here"></textarea>
+  <div class="bar">
+    <span id="report" aria-live="polite"></span>
+    <button id="copy" class="primary">Copy</button>
+  </div>
+  <footer>Runs offline in your browser. More tools: <a id="site" href="https://www.cleantextfree.com/?utm_source=chrome-extension&utm_medium=extension&utm_campaign=popup_footer" target="_blank" rel="noopener">cleantextfree.com</a></footer>
+  <script src="defaults.js"></script>
+  <script src="lib/ai-cleaner.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

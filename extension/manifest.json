@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "CleanTextFree — AI Text Cleaner",
+  "short_name": "CleanTextFree",
+  "version": "1.0.0",
+  "description": "Remove Markdown, ** and ###, em dashes and hidden Unicode characters from ChatGPT, Claude and Gemini text. Runs offline.",
+  "action": { "default_popup": "popup.html", "default_title": "Clean AI text" },
+  "background": { "service_worker": "background.js" },
+  "permissions": ["contextMenus", "scripting", "activeTab", "storage", "clipboardWrite"],
+  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "homepage_url": "https://www.cleantextfree.com/ai-text-cleaner?utm_source=chrome-extension&utm_medium=extension&utm_campaign=homepage_url"
+}
