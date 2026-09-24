@@ -33,6 +33,10 @@ const clean = (s, o) => cleanAiText(s, Object.assign({}, OPTS, o)).text;
   assert.strictEqual(scanInvisible('👨‍👩‍👧').total, 0);
   assert.strictEqual(scanInvisible('a‍b').total, 1);
   assert.strictEqual(clean('👨‍👩‍👧'), '👨‍👩‍👧');
+  // Skin-tone modifier before the joiner (woman technologist, medium skin tone).
+  const tech = '👩🏽‍💻';
+  assert.strictEqual(scanInvisible(tech).total, 0, 'skin-tone ZWJ emoji flagged as hidden');
+  assert.strictEqual(clean(tech), tech, 'skin-tone ZWJ emoji split');
 }
 
 // Things that look like Markdown but are not.

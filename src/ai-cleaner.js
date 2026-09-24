@@ -44,6 +44,7 @@
   }
 
   var EMOJI = /\p{Extended_Pictographic}/u;
+  var SKIN = /\p{Emoji_Modifier}/u;
 
   // Scan text for invisible characters. Returns {counts:{name:n}, total}.
   function scanInvisible(text) {
@@ -61,7 +62,10 @@
   // Keep ZWJ / variation-selector sequences inside emoji (e.g. family emoji).
   function isEmojiJoiner(chars, i) {
     if (chars[i] !== '‍') return false;
-    var prev = chars[i - 1] === '️' ? chars[i - 2] : chars[i - 1];
+    // Step back over a variation selector and a skin-tone modifier (e.g. woman + medium skin + ZWJ + laptop).
+    var j = i - 1;
+    while (j > 0 && (chars[j] === '️' || SKIN.test(chars[j]))) j--;
+    var prev = chars[j];
     return !!prev && EMOJI.test(prev) && !!chars[i + 1] && EMOJI.test(chars[i + 1]);
   }
 
