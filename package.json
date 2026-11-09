@@ -1,7 +1,7 @@
 {
   "name": "cleantextfree",
-  "version": "1.0.0",
-  "description": "Clean text copied from ChatGPT, Claude and Gemini: strip Markdown, em dashes and hidden Unicode characters. Browser engine + Chrome extension.",
+  "version": "1.0.2",
+  "description": "Clean text copied from ChatGPT, Claude and Gemini: strip Markdown, citation markers, AI tracking tags, em dashes and hidden Unicode characters. Browser engine + Chrome extension.",
   "license": "MIT",
   "homepage": "https://www.cleantextfree.com/ai-text-cleaner",
   "scripts": {

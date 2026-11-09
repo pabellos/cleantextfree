@@ -1,11 +1,14 @@
 # CleanTextFree — AI text cleaner
 
-Clean text copied from ChatGPT, Claude or Gemini before you paste it into an email, a document or a CMS.
+Removes `[1][2]`, `【4†source】`, `utm_source=chatgpt.com` and invisible characters from text copied out of ChatGPT, Claude, Gemini, Perplexity or Copilot. Does not change your words.
 
 - Strips Markdown symbols: `**bold**`, `*italic*`, `###` headings, list markers, tables (to tab-separated), links
 - Replaces em dashes with a comma or hyphen (or keeps them)
 - Removes hidden Unicode characters: zero-width spaces, no-break spaces, soft hyphens, bidirectional marks
-- Removes leftover citation markers such as `【4†source】`
+- Removes citation leftovers: Perplexity `[3][14]`, `[1](https://…)` link citations, `【4†source】`, Gemini `[cite_start]` / `[cite: 1, 2]`
+- Removes `utm_source=chatgpt.com`-style tracking tags from links (optionally every `utm_`, `gclid`, `fbclid`)
+- Optional emoji removal; emoji sequences and flags survive the hidden-character pass
+- Resolves Markdown backslash escapes, GFM table alignment rows, setext underlines
 - Leaves fenced and inline code untouched
 
 Everything runs locally. No text is sent anywhere.

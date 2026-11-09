@@ -4,8 +4,11 @@
   var mode = 'ai';
   var input = $('input'), output = $('output'), report = $('report');
 
+  function userOpts() {
+    return { emDash: $('emDash').value, keepLinks: $('keepLinks').checked, quotes: $('quotes').checked, tracking: $('tracking').checked, emoji: $('emoji').checked };
+  }
   function opts() {
-    return Object.assign({}, CTF_DEFAULTS, { emDash: $('emDash').value, keepLinks: $('keepLinks').checked });
+    return Object.assign({}, CTF_DEFAULTS, userOpts());
   }
   function run() {
     var src = input.value;
@@ -22,6 +25,9 @@
       if (s.emDash) parts.push(s.emDash + ' em dash');
       if (s.invisible) parts.push(s.invisible + ' hidden');
       if (s.citations) parts.push(s.citations + ' citation');
+      if (s.tracking) parts.push(s.tracking + ' tracking tag');
+      if (s.quotes) parts.push(s.quotes + ' quote');
+      if (s.emoji) parts.push(s.emoji + ' emoji');
       report.textContent = parts.length ? 'Removed: ' + parts.join(' · ') : 'Nothing to clean';
     }
   }
@@ -34,9 +40,9 @@
     });
   });
   input.addEventListener('input', run);
-  ['emDash', 'keepLinks'].forEach(function (id) {
+  CTF_USER_KEYS.forEach(function (id) {
     $(id).addEventListener('change', function () {
-      chrome.storage.local.set({ emDash: $('emDash').value, keepLinks: $('keepLinks').checked });
+      chrome.storage.local.set(userOpts());
       run();
     });
   });
@@ -47,8 +53,8 @@
       setTimeout(function () { $('copy').textContent = 'Copy'; }, 1500);
     });
   });
-  chrome.storage.local.get(['emDash', 'keepLinks'], function (s) {
+  chrome.storage.local.get(CTF_USER_KEYS, function (s) {
     if (s.emDash) $('emDash').value = s.emDash;
-    if (typeof s.keepLinks === 'boolean') $('keepLinks').checked = s.keepLinks;
+    ['keepLinks', 'quotes', 'tracking', 'emoji'].forEach(function (k) { if (typeof s[k] === 'boolean') $(k).checked = s[k]; });
   });
 })();

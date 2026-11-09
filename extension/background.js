@@ -8,7 +8,7 @@ chrome.runtime.onInstalled.addListener(function () {
 
 chrome.contextMenus.onClicked.addListener(async function (info, tab) {
   if (!tab || !tab.id) return;
-  const stored = await chrome.storage.local.get(['emDash', 'keepLinks']);
+  const stored = await chrome.storage.local.get(CTF_USER_KEYS);
   const opts = Object.assign({}, CTF_DEFAULTS, stored);
   try {
     await chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: false }, files: ['lib/ai-cleaner.js'] });
