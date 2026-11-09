@@ -159,15 +159,26 @@
   var NUM_CITE = /[ \t]?(?:\[\d{1,3}(?:\s*[,–-]\s*\d{1,3})*\])+(?=[\s.,;:!?]|$)/g;
   // A numbered link is a citation, not a link: [1](https://…) (Claude, ChatGPT) and [[1]](https://…) (Grok API).
   var LINK_CITE = /[ \t]?\[\[?\d{1,3}\]?\]\((?:https?:)?\/\/[^)\s]+\)(?=[\s.,;:!?)]|$)/g;
-  function stripNumericCitations(text, stats) {
+  // Source pills copied from the web apps (Chrome test, 2026-11-09): Perplexity writes each pill as a Markdown link whose
+  // label is a bare domain fragment — "…GDP. [ec.europa](https://…)"; ChatGPT wraps it — "([nytimes.com](https://…))".
+  var PILL_LINK = /[ \t]?\(?\[[a-z0-9][a-z0-9-]*(?:\.[a-z0-9-]+)+\]\((?:https?:)?\/\/[^)\s]+\)\)?(?=[\s.,;:!?)]|$)/gi;
+  function stripNumericCitations(text, stats, keepLinks) {
     return text.split('\n').map(function (line) {
       if (/^\s*\[\d{1,3}\]/.test(line)) return line;
       return line.split(/(`[^`\n]+`)/).map(function (part, i) {
         if (i % 2) return part;
         part = part.replace(LINK_CITE, function () { stats.citations++; return ''; });
+        if (!keepLinks) part = part.replace(PILL_LINK, function () { stats.citations++; return ''; });
         return part.replace(NUM_CITE, function () { stats.citations++; return ''; });
       }).join('');
     }).join('\n');
+  }
+
+  // ChatGPT's Copy button (web, 2026-11) leaves two more things in the plain text: an "[image](https://…)" placeholder for
+  // every source pill, and the pill label on its own line ("Eurostat+1", "Destatis+1").
+  function stripChatGptPills(text, stats) {
+    text = text.replace(/[ \t]?\[image\]\((?:https?:)?\/\/[^)\s]+\)/g, function () { stats.citations++; return ''; });
+    return text.replace(/^[ \t]*[A-Z][A-Za-z0-9.&-]{1,40}\+\d{1,2}[ \t]*$\n?/gm, function () { stats.citations++; return ''; });
   }
 
   // ---------- Emoji (optional) ----------
@@ -234,7 +245,8 @@
       // Gemini file-analysis leftovers: [cite_start] … [cite: 1, 2, 19]
       text = text.replace(/\[cite_start\][ \t]?/gi, function () { stats.citations++; return ''; });
       text = text.replace(/[ \t]?\[cite:\s*[\d,\s–-]+\]/gi, function () { stats.citations++; return ''; });
-      text = stripNumericCitations(text, stats);
+      text = stripChatGptPills(text, stats);
+      text = stripNumericCitations(text, stats, o.keepLinks);
     }
     if (o.citations || o.tracking) text = stripTracking(text, o.tracking, stats);
     if (o.markdown) text = stripMarkdown(text, o, stats);
@@ -242,6 +254,11 @@
     // URLs are parked while dashes and quotes are rewritten (https://x.com/a—b must stay a working link).
     var urls = [];
     text = text.replace(/https?:\/\/[^\s<>()"'\]]+/g, function (u) { urls.push(u); return '\u0007' + (urls.length - 1) + '\u0007'; });
+    // HTML entities that leak into copied plain text (ChatGPT's Copy button emits "&#x20;" after paragraphs).
+    if (o.markdown) {
+      var ENT = { '#x20': ' ', '#32': ' ', nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" };
+      text = text.replace(/&(#x20|#32|nbsp|amp|lt|gt|quot|#39);/g, function (m, e) { stats.markdown++; return ENT[e]; });
+    }
     if (o.emDash !== 'keep') {
       // Between digits an em dash is a range: 2010—2020 → 2010-2020, never a comma.
       text = text.replace(/(\d)\s*—\s*(?=\d)/g, function (m, d) { stats.emDash++; return d + '-'; });
@@ -421,6 +438,30 @@
     }
 
     function schedule() { clearTimeout(timer); timer = setTimeout(run, input.value.length > 50000 ? 250 : 40); }
+
+    // Presets by destination (Chrome clipboard test, 2026-11-09): Notion converts Markdown itself, so only hidden characters and
+    // citations go; spreadsheets want the tab-separated table with dashes left alone; email/LinkedIn/forms want everything stripped.
+    var PRESETS = {
+      email: { optMarkdown: true, optInvisible: true, optCitations: true, optQuotes: false, optTidy: true, optKeepLinks: false, optTracking: false, optEmoji: false, optEmDash: 'comma', optBullets: 'dot' },
+      notion: { optMarkdown: false, optInvisible: true, optCitations: true, optQuotes: false, optTidy: true, optKeepLinks: false, optTracking: false, optEmoji: false, optEmDash: 'keep', optBullets: 'keep' },
+      sheet: { optMarkdown: true, optInvisible: true, optCitations: true, optQuotes: false, optTidy: true, optKeepLinks: false, optTracking: false, optEmoji: false, optEmDash: 'keep', optBullets: 'dash' }
+    };
+    function applyPreset(name) {
+      var p = PRESETS[name];
+      if (!p) return;
+      Object.keys(p).forEach(function (id) {
+        var el = $(id);
+        if (!el) return;
+        if (el.type === 'checkbox') el.checked = p[id]; else el.value = p[id];
+      });
+      root.querySelectorAll('[data-preset]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-preset') === name); });
+      if (window.ctfTrack) window.ctfTrack('tool_preset', { preset: name });
+      run();
+    }
+    root.querySelectorAll('[data-preset]').forEach(function (b) { b.addEventListener('click', function () { applyPreset(b.getAttribute('data-preset')); }); });
+    root.querySelectorAll('.ac-opt').forEach(function (el) {
+      el.addEventListener('change', function () { root.querySelectorAll('[data-preset]').forEach(function (b) { b.classList.remove('active'); }); });
+    });
 
     root.querySelectorAll('[data-mode-tab]').forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode-tab')); }); });
     root.querySelectorAll('[data-html-view]').forEach(function (b) { b.addEventListener('click', function () { setHtmlView(b.getAttribute('data-html-view')); }); });

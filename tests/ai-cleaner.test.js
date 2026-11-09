@@ -135,4 +135,20 @@ const clean = (s, o) => cleanAiText(s, Object.assign({}, OPTS, o)).text;
   assert.strictEqual(cleanAiText(src, Object.assign({ emoji: true }, OPTS)).stats.emoji, 5);
 }
 
+// Web-app copy artifacts measured in Chrome on 2026-11-09 (see research/2026-11 clipboard matrix).
+{
+  // Perplexity Copy button: source pills are domain-label links after the sentence.
+  assert.strictEqual(clean('GDP of the bloc. [ec.europa](https://ec.europa.eu/x)\n\n- **Germany** led. [ec.europa](https://ec.europa.eu/y)'),
+    'GDP of the bloc.\n\n• Germany led.');
+  // ChatGPT Copy button: "([domain](url))" pills, "[image](url)" placeholders, pill labels on their own line, &#x20; entities.
+  assert.strictEqual(clean('Margin.&#x20;\n\n[image](https://chatgpt.com/img)\n\nEurostat+1\n\n\n\nNext ([nytimes.com](https://nyt.com/a?utm_source=chatgpt.com)) end.'),
+    'Margin.\n\nNext end.');
+  // With "Keep link URLs" on, domain-label links are treated as links the user wants.
+  assert.strictEqual(clean('See [ec.europa](https://ec.europa.eu/x).', { keepLinks: true }), 'See ec.europa (https://ec.europa.eu/x).');
+  // Ordinary links with word labels are untouched by the pill rule.
+  assert.strictEqual(clean('Read [the full report](https://a.com/r) now.'), 'Read the full report now.');
+  // Entities inside URLs stay encoded (URL is parked).
+  assert.strictEqual(clean('https://a.com/?x=1&amp;y=2 and a &amp; b', { keepLinks: true }), 'https://a.com/?x=1&amp;y=2 and a & b');
+}
+
 console.log('ai-cleaner: all tests passed');
