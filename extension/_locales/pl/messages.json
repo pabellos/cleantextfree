@@ -1,0 +1,8 @@
+{
+  "extName": { "message": "CleanTextFree — czyszczenie tekstu z AI" },
+  "extShortName": { "message": "CleanTextFree" },
+  "extDescription": { "message": "Usuwa Markdown, cytowania [3][14] i 【4†source】, tagi utm_source=chatgpt.com, myślniki i ukryte znaki Unicode z tekstu AI. Offline." },
+  "actionTitle": { "message": "Wyczyść tekst z AI" },
+  "menuClean": { "message": "Wyczyść tekst z AI i skopiuj" },
+  "menuHidden": { "message": "Usuń ukryte znaki i skopiuj" }
+}

@@ -1,0 +1,8 @@
+{
+  "extName": { "message": "CleanTextFree — AI Text Cleaner", "description": "Extension name in the Chrome Web Store and toolbar" },
+  "extShortName": { "message": "CleanTextFree" },
+  "extDescription": { "message": "Remove Markdown, [3][14] and 【4†source】 citations, utm_source=chatgpt.com tags, em dashes and hidden Unicode from AI text. Offline.", "description": "Store summary, max 132 characters" },
+  "actionTitle": { "message": "Clean AI text" },
+  "menuClean": { "message": "Clean AI text & copy" },
+  "menuHidden": { "message": "Remove hidden characters & copy" }
+}

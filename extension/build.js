@@ -29,7 +29,7 @@ const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
   // Zip from a staging dir so paths inside the archive keep their folders (lib/, icons/).
   const stage = path.join(root, 'dist', 'stage');
   fs.rmSync(stage, { recursive: true, force: true });
-  const files = ['manifest.json', 'background.js', 'defaults.js', 'popup.html', 'popup.css', 'popup.js', 'lib/ai-cleaner.js', 'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png'];
+  const files = ['manifest.json', 'background.js', 'defaults.js', 'popup.html', 'popup.css', 'popup.js', 'lib/ai-cleaner.js', 'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png', '_locales/en/messages.json', '_locales/pl/messages.json'];
   for (const f of files) {
     fs.mkdirSync(path.dirname(path.join(stage, f)), { recursive: true });
     fs.copyFileSync(path.join(root, f), path.join(stage, f));

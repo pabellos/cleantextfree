@@ -2,8 +2,8 @@
 importScripts('defaults.js');
 
 chrome.runtime.onInstalled.addListener(function () {
-  chrome.contextMenus.create({ id: 'ctf-clean', title: 'Clean AI text & copy', contexts: ['selection'] });
-  chrome.contextMenus.create({ id: 'ctf-hidden', title: 'Remove hidden characters & copy', contexts: ['selection'] });
+  chrome.contextMenus.create({ id: 'ctf-clean', title: chrome.i18n.getMessage('menuClean') || 'Clean AI text & copy', contexts: ['selection'] });
+  chrome.contextMenus.create({ id: 'ctf-hidden', title: chrome.i18n.getMessage('menuHidden') || 'Remove hidden characters & copy', contexts: ['selection'] });
 });
 
 chrome.contextMenus.onClicked.addListener(async function (info, tab) {
